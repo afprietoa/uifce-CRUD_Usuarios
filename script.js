@@ -1,4 +1,4 @@
-// Simulación de base de datos
+// Simulación de base de datos en memoria
 let users = [
     { id: 1, name: "Laura García", email: "laura@gmail.com" },
     { id: 2, name: "Carlos Ruiz", email: "carlos@hotmail.com" }
@@ -16,10 +16,15 @@ let users = [
     users.forEach(user => {
       userList.innerHTML += `
         <div class="user-card">
-          <p><strong>Nombre:</strong> ${user.name}</p>
-          <p><strong>Correo:</strong> ${user.email}</p>
-          <button onclick="editUser(${user.id})">Editar</button>
-          <button onclick="deleteUser(${user.id})">Eliminar</button>
+          <div class="user-content">
+            <p class="user-id">ID: ${user.id}</p>
+            <p><strong>Nombre:</strong> ${user.name}</p>
+            <p><strong>Correo:</strong> ${user.email}</p>
+          </div>
+          <div class="user-actions">
+            <button class="edit" onclick="editUser(${user.id})"><i class="fas fa-edit"></i></button>
+            <button class="delete" onclick="deleteUser(${user.id})"><i class="fas fa-trash-alt"></i></button>
+          </div>
         </div>
       `;
     });
@@ -32,23 +37,20 @@ let users = [
     const email = emailInput.value.trim();
     const id = userIdInput.value;
   
-    if (!name || !email) return;
+    if (!name || !email) {
+      alert("Todos los campos son obligatorios.");
+      return;
+    }
   
     if (id) {
-      // Editar usuario
       const user = users.find(u => u.id == id);
       if (user) {
         user.name = name;
         user.email = email;
       }
     } else {
-      // Crear nuevo usuario
-      const newUser = {
-        id: Date.now(),
-        name,
-        email
-      };
-      users.push(newUser);
+      const newId = users.length > 0 ? users[users.length - 1].id + 1 : 1;
+      users.push({ id: newId, name, email });
     }
   
     resetForm();
@@ -66,10 +68,8 @@ let users = [
   }
   
   function deleteUser(id) {
-    if (confirm("¿Estás seguro de eliminar este usuario?")) {
-      users = users.filter(u => u.id !== id);
-      renderUsers();
-    }
+    users = users.filter(u => u.id !== id);
+    renderUsers();
   }
   
   function resetForm() {
